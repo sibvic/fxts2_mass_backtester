@@ -21,6 +21,10 @@ echo.
 echo Running DatesIteratorTests...
 .\bin\Release\DatesIteratorTests.exe
 
+echo.
+echo Running SymbolInfoParserTests...
+.\bin\Release\SymbolInfoParserTests.exe
+
 if %ERRORLEVEL% NEQ 0 (
     echo Tests failed!
     cd ..

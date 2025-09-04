@@ -11,6 +11,7 @@ The project uses **Google Test (gtest)** as the testing framework, which is auto
 ### Test Files
 - `tests/test_BacktestProjectSerializer.cpp` - Comprehensive tests for the BacktestProjectSerializer class
 - `tests/test_DatesIterator.cpp` - Comprehensive tests for the DatesIterator class
+- `tests/test_SymbolInfoParser.cpp` - Comprehensive tests for the SymbolInfoParser class
 
 ### Test Categories
 
@@ -48,6 +49,34 @@ The project uses **Google Test (gtest)** as the testing framework, which is auto
 - **SpecificKnownDates**: Tests specific date calculations
 - **LeapYearFebruary29**: Tests February 29 handling in leap years
 - **LongPeriodHandling**: Tests very long time period handling
+
+#### 6. SymbolInfoParser Tests
+- **ParseCompleteValidJson**: Tests parsing a complete valid JSON file
+- **ParseWithMissingFields**: Tests parsing with missing fields (default values)
+- **ParseBooleanValues**: Tests parsing boolean values (true/false)
+- **ParseNumericValues**: Tests parsing numeric values in different formats
+- **ParseScientificNotation**: Tests parsing scientific notation numbers
+- **ParseEmptyStringValues**: Tests parsing empty string values
+- **ParseWithWhitespace**: Tests parsing with whitespace in values
+- **ParseDifferentFieldOrder**: Tests parsing with different field order
+- **ParseWithExtraFields**: Tests parsing with extra fields (ignored)
+- **ParseWithNestedObjects**: Tests parsing with nested objects
+- **ParseWithArrays**: Tests parsing with arrays
+- **ParseWithSpecialCharacters**: Tests parsing with special characters
+- **ParseLargeNumbers**: Tests parsing with very large numbers
+- **ParseNegativeNumbers**: Tests parsing with negative numbers
+- **ParseZeroValues**: Tests parsing with zero values
+- **ParseWithDuplicateKeys**: Tests parsing with duplicate keys
+- **ParseWithLongStrings**: Tests parsing with very long strings
+- **ParseWithVerySmallNumbers**: Tests parsing with very small numbers
+- **ParseUnquotedBooleanValues**: Tests parsing unquoted boolean values
+- **ParseEmptyJson**: Tests parsing with empty JSON object
+- **ParseOnlyWhitespace**: Tests parsing with only whitespace
+- **ParseInvalidNumericValues**: Tests parsing with invalid numeric values
+- **ParseLargeIntegerValues**: Tests parsing with very large integers
+- **ParseSmallIntegerValues**: Tests parsing with very small integers
+- **ParseFileNotFound**: Tests error handling for missing files
+- **ParseInvalidJson**: Tests error handling for malformed JSON
 
 ## Running Tests
 
@@ -113,6 +142,14 @@ The tests cover the following aspects of BacktestProjectSerializer:
 - Month and year boundary handling
 - Leap year calculations
 - Long-term date consistency
+- JSON parsing functionality
+- Symbol information extraction
+- Boolean value parsing
+- Numeric value parsing (integers, doubles, scientific notation)
+- String value parsing
+- Default value handling
+- Malformed JSON handling
+- Edge case handling (empty files, null values, etc.)
 
 ### ⚠️ Known Limitations
 - **File Permission Tests**: Some file permission tests may not work on all systems.

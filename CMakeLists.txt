@@ -16,6 +16,7 @@ add_executable(${PROJECT_NAME}
     src/BacktestProjectSerializer.cpp
     src/ConsoleBacktester.cpp
     src/DatesIterator.cpp
+    src/SymbolInfoParser.cpp
 )
 
 # Set compiler flags
@@ -27,6 +28,9 @@ endif()
 
 # Include directories
 target_include_directories(${PROJECT_NAME} PRIVATE src)
+
+# Link nlohmann_json to main executable
+target_link_libraries(${PROJECT_NAME} nlohmann_json::nlohmann_json)
 
 # Set build type if not specified
 if(NOT CMAKE_BUILD_TYPE)
@@ -43,6 +47,13 @@ FetchContent_Declare(
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
+# nlohmann/json setup using FetchContent
+FetchContent_Declare(
+  nlohmann_json
+  URL https://github.com/nlohmann/json/releases/download/v3.11.2/json.tar.xz
+)
+FetchContent_MakeAvailable(nlohmann_json)
+
 # Test executables
 add_executable(
   BacktestProjectSerializerTests
@@ -57,6 +68,12 @@ add_executable(
   src/DatesIterator.cpp
 )
 
+add_executable(
+  SymbolInfoParserTests
+  tests/test_SymbolInfoParser.cpp
+  src/SymbolInfoParser.cpp
+)
+
 # Link test executables with gtest
 target_link_libraries(
   BacktestProjectSerializerTests
@@ -68,9 +85,16 @@ target_link_libraries(
   gtest_main
 )
 
+target_link_libraries(
+  SymbolInfoParserTests
+  gtest_main
+  nlohmann_json::nlohmann_json
+)
+
 # Include directories for tests
 target_include_directories(BacktestProjectSerializerTests PRIVATE src)
 target_include_directories(DatesIteratorTests PRIVATE src)
+target_include_directories(SymbolInfoParserTests PRIVATE src)
 
 # Enable testing
 enable_testing()
@@ -78,6 +102,7 @@ enable_testing()
 # Add tests to CTest
 add_test(NAME BacktestProjectSerializerTests COMMAND BacktestProjectSerializerTests)
 add_test(NAME DatesIteratorTests COMMAND DatesIteratorTests)
+add_test(NAME SymbolInfoParserTests COMMAND SymbolInfoParserTests)
 
 # Print configuration info
 message(STATUS "Project: ${PROJECT_NAME}")

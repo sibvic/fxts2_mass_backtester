@@ -21,6 +21,10 @@ echo ""
 echo "Running DatesIteratorTests..."
 ./bin/Release/DatesIteratorTests
 
+echo ""
+echo "Running SymbolInfoParserTests..."
+./bin/Release/SymbolInfoParserTests
+
 if [ $? -ne 0 ]; then
     echo "Tests failed!"
     cd ..
