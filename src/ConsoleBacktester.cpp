@@ -36,10 +36,6 @@ void ConsoleBacktester::run(const BacktestProject& project, const std::optional<
     
     std::string command = backtesterPath.string() + " " + projectPath.string() + " /o " + outputPath.string() 
         + " /so " + statsPath.string();
-    if (tradingHistoryPath.has_value())
-    {
-        command += " /trading_history " + tradingHistoryPath.value();
-    }
     std::system(command.c_str());
 
     // Delete temporary files

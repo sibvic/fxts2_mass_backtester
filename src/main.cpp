@@ -131,7 +131,7 @@ int main(int argc, char* argv[]) {
     // Display configuration
     printConfig(config);
     
-    auto backtester = ConsoleBacktester(config.pathToBacktester, config.strategyId);
+    auto backtester = ConsoleBacktester(config.pathToBacktester, "1");
     
     // Get current time and calculate start of current week
     std::time_t now = std::time(nullptr);
