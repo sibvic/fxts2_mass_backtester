@@ -180,7 +180,7 @@ int main(int argc, char* argv[]) {
     project.accountCurrency = "USD";
     project.initialAmount = 50000.0;
     project.defaultPeriod = "m1";
-    project.accountLotSize = static_cast<int>(symbolInfo.baseUnitSize);
+    project.accountLotSize = 0;
     
     // Create instrument from symbol info
     project.instruments.emplace_back(
