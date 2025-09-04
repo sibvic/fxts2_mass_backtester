@@ -3,8 +3,10 @@
 #include <map>
 #include <vector>
 #include <ctime>
+#include <iomanip>
 #include "BacktestProject.h"
 #include "ConsoleBacktester.h"
+#include "DatesIterator.h"
 
 struct AppConfig {
     std::string sourcesPath;
@@ -87,6 +89,17 @@ void printConfig(const AppConfig& config) {
     std::cout << std::endl;
 }
 
+int getWeekNumber(const std::tm& date) {
+    std::tm firstJan = date;
+    firstJan.tm_mon = 0;
+    firstJan.tm_mday = 1;
+    firstJan.tm_hour = 0;
+    firstJan.tm_min = 0;
+    firstJan.tm_sec = 0;
+    std::mktime(&firstJan);
+    return firstJan.tm_yday / 7 + 1;
+}
+
 int main(int argc, char* argv[]) {
     std::cout << "Welcome to FXTS2 Mass Backtester Console Application!" << std::endl;
     std::cout << "==================================================" << std::endl;
@@ -109,18 +122,56 @@ int main(int argc, char* argv[]) {
     printConfig(config);
     
     auto backtester = ConsoleBacktester(config.pathToBacktester, config.strategyId);
+    
+    // Get current time and calculate start of current week
+    std::time_t now = std::time(nullptr);
+    
+    DatesIterator datesIterator;
+    int totalWeeks = 0;
+    int completedWeeks = 0;
+    
     auto project = BacktestProject();
     project.strategy = config.strategyId;
-    project.startTime = 946684800; // 1 January 2000, 00:00:00 UTC
-    project.endTime = static_cast<long long>(std::time(nullptr));
     project.accountCurrency = "USD";
     project.initialAmount = 50000.0;
     project.defaultPeriod = "m1";
     project.accountLotSize = 100000;
     project.instruments.emplace_back(config.tradingSymbol, 0.02, 0.0001, 5, "EUR", "USD", 1, 100000, 1);
-    backtester.run(project);
-
-    std::cout << "Backtest completed" << std::endl;
+    
+    // Loop through each week from start date to current week start
+    std::tm currentDate = datesIterator.current();
+    std::tm nextDate = datesIterator.next();
+    while (std::mktime(&nextDate) < now) {
+        totalWeeks++;
+        
+        int week = getWeekNumber(currentDate);
+        
+        // Create project for this week
+        project.startTime = std::mktime(&currentDate);
+        project.endTime = std::mktime(&nextDate);
+        std::cout << "Start date: " << std::put_time(&currentDate, "%Y-%m-%d") 
+                  << ", End date: " << std::put_time(&nextDate, "%Y-%m-%d") << std::endl;
+        
+        // Create trading history path
+        auto tradingHistoryPath = "history/" + config.tradingSymbol + "/" + std::to_string(currentDate.tm_year + 1900) 
+            + "/" + std::to_string(week) + ".csv";
+        
+        std::cout << "Running backtest for week " << tradingHistoryPath << std::endl;
+        
+        try {
+            backtester.run(project, tradingHistoryPath);
+            completedWeeks++;
+        } catch (const std::exception& e) {
+            std::cerr << "Error running backtest for week " << tradingHistoryPath 
+                      << ": " << e.what() << std::endl;
+        }
+        
+        // Move to next week
+        currentDate = nextDate;
+        nextDate = datesIterator.next();
+    }
+    
+    std::cout << "Backtest completed. Processed " << completedWeeks << " out of " << totalWeeks << " weeks." << std::endl;
     
     return 0;
 }

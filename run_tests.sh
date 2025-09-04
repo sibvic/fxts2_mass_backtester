@@ -12,6 +12,15 @@ cd build
 echo "Running tests..."
 ctest --output-on-failure -C Release
 
+echo ""
+echo "Running individual test executables..."
+echo "Running BacktestProjectSerializerTests..."
+./bin/Release/BacktestProjectSerializerTests
+
+echo ""
+echo "Running DatesIteratorTests..."
+./bin/Release/DatesIteratorTests
+
 if [ $? -ne 0 ]; then
     echo "Tests failed!"
     cd ..

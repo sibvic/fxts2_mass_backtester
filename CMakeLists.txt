@@ -15,6 +15,7 @@ add_executable(${PROJECT_NAME}
     src/main.cpp
     src/BacktestProjectSerializer.cpp
     src/ConsoleBacktester.cpp
+    src/DatesIterator.cpp
 )
 
 # Set compiler flags
@@ -42,27 +43,41 @@ FetchContent_Declare(
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
-# Test executable
+# Test executables
 add_executable(
   BacktestProjectSerializerTests
   tests/test_BacktestProjectSerializer.cpp
   src/BacktestProjectSerializer.cpp
+  src/DatesIterator.cpp
 )
 
-# Link test executable with gtest
+add_executable(
+  DatesIteratorTests
+  tests/test_DatesIterator.cpp
+  src/DatesIterator.cpp
+)
+
+# Link test executables with gtest
 target_link_libraries(
   BacktestProjectSerializerTests
   gtest_main
 )
 
+target_link_libraries(
+  DatesIteratorTests
+  gtest_main
+)
+
 # Include directories for tests
 target_include_directories(BacktestProjectSerializerTests PRIVATE src)
+target_include_directories(DatesIteratorTests PRIVATE src)
 
 # Enable testing
 enable_testing()
 
-# Add test to CTest
+# Add tests to CTest
 add_test(NAME BacktestProjectSerializerTests COMMAND BacktestProjectSerializerTests)
+add_test(NAME DatesIteratorTests COMMAND DatesIteratorTests)
 
 # Print configuration info
 message(STATUS "Project: ${PROJECT_NAME}")

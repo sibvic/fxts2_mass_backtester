@@ -12,6 +12,15 @@ cd build
 echo Running tests...
 ctest --output-on-failure -C Release
 
+echo.
+echo Running individual test executables...
+echo Running BacktestProjectSerializerTests...
+.\bin\Release\BacktestProjectSerializerTests.exe
+
+echo.
+echo Running DatesIteratorTests...
+.\bin\Release\DatesIteratorTests.exe
+
 if %ERRORLEVEL% NEQ 0 (
     echo Tests failed!
     cd ..

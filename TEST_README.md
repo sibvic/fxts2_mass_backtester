@@ -10,6 +10,7 @@ The project uses **Google Test (gtest)** as the testing framework, which is auto
 
 ### Test Files
 - `tests/test_BacktestProjectSerializer.cpp` - Comprehensive tests for the BacktestProjectSerializer class
+- `tests/test_DatesIterator.cpp` - Comprehensive tests for the DatesIterator class
 
 ### Test Categories
 
@@ -32,6 +33,21 @@ The project uses **Google Test (gtest)** as the testing framework, which is auto
 - **SerializeMultipleStrategyParameters**: Tests serialization with multiple strategy parameters
 - **SerializeSpecialCharacters**: Tests handling of special characters in strings
 - **SerializeNumericPrecision**: Tests numeric precision in serialization
+
+#### 5. DatesIterator Tests
+- **ConstructorInitializesToCorrectDate**: Tests that constructor starts at January 1, 2000
+- **CurrentReturnsSameDate**: Tests that current() returns consistent results
+- **NextAdvancesBySevenDays**: Tests that next() advances by exactly 7 days
+- **MultipleNextCallsAdvanceCorrectly**: Tests multiple consecutive next() calls
+- **MonthBoundaryCrossing**: Tests proper handling of month transitions
+- **YearBoundaryCrossing**: Tests proper handling of year transitions
+- **LeapYearHandling**: Tests leap year date calculations
+- **CurrentReflectsStateAfterNext**: Tests state consistency
+- **ConsistencyOverManyIterations**: Tests long-term consistency
+- **TimeComponentsRemainAtMidnight**: Tests time component preservation
+- **SpecificKnownDates**: Tests specific date calculations
+- **LeapYearFebruary29**: Tests February 29 handling in leap years
+- **LongPeriodHandling**: Tests very long time period handling
 
 ## Running Tests
 
@@ -92,6 +108,11 @@ The tests cover the following aspects of BacktestProjectSerializer:
 - Multiple data elements
 - Error handling for file operations
 - Numeric precision handling
+- Date iteration functionality
+- Week-by-week date advancement
+- Month and year boundary handling
+- Leap year calculations
+- Long-term date consistency
 
 ### ⚠️ Known Limitations
 - **File Permission Tests**: Some file permission tests may not work on all systems.
