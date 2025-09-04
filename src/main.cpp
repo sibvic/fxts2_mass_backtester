@@ -6,6 +6,7 @@
 #include <ctime>
 #include <iomanip>
 #include <filesystem>
+#include <algorithm>
 #include "BacktestProject.h"
 #include "ConsoleBacktester.h"
 #include "DatesIterator.h"
@@ -140,7 +141,10 @@ int main(int argc, char* argv[]) {
     int completedWeeks = 0;
     
     // Load symbol information from config file
-    std::string symbolInfoPath = config.historyPath + "/" + config.tradingSymbol + "/info.json";
+    // Escape forward slashes in trading symbol for file paths
+    std::string escapedSymbol = config.tradingSymbol;
+    escapedSymbol.erase(std::remove(escapedSymbol.begin(), escapedSymbol.end(), '/'), escapedSymbol.end());
+    std::string symbolInfoPath = config.historyPath + "/" + escapedSymbol + "/info.json";
     
     // Check if symbol info file exists
     if (!std::filesystem::exists(symbolInfoPath)) {
@@ -201,7 +205,7 @@ int main(int argc, char* argv[]) {
         
         // Create trading history path
         std::optional<std::string> tradingHistoryPath = 
-            config.historyPath.empty() ? std::optional<std::string>() : std::optional<std::string>(config.historyPath + "/" + config.tradingSymbol + "/" + std::to_string(currentDate.tm_year + 1900) 
+            config.historyPath.empty() ? std::optional<std::string>() : std::optional<std::string>(config.historyPath + "/" + escapedSymbol + "/" + std::to_string(currentDate.tm_year + 1900) 
             + "-" + std::to_string(week) + ".csv");
         
         std::cout << "Running backtest for week " << tradingHistoryPath.value_or("no trading history") << std::endl;

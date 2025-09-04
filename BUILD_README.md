@@ -73,6 +73,10 @@ The application automatically loads symbol-specific configuration from JSON file
 {history_path}/{trading_symbol}/info.json
 ```
 
+**Note:** Forward slashes (`/`) in trading symbols are automatically escaped to underscores (`_`) for file path compatibility. For example:
+- Trading symbol `EUR/USD` → File path `{history_path}/EURUSD/info.json`
+- Trading symbol `GBP/USD` → File path `{history_path}/GBPUSD/info.json`
+
 **Example symbol info file structure:**
 ```json
 {
@@ -113,12 +117,12 @@ If the symbol info file is not found or cannot be parsed, the application will u
 
 **Windows:**
 ```batch
-build\bin\Release\FXTS2MassBacktester.exe --sources_path ./data --strategy_id MA_CROSS --trading_symbol EURUSD --history_path ./history
+build\bin\Release\FXTS2MassBacktester.exe --sources_path ./data --strategy_id MA_CROSS --trading_symbol EUR/USD --history_path ./history
 ```
 
 **Linux/macOS:**
 ```bash
-./FXTS2MassBacktester --sources_path ./data --strategy_id MA_CROSS --trading_symbol EURUSD --history_path ./history
+./FXTS2MassBacktester --sources_path ./data --strategy_id MA_CROSS --trading_symbol EUR/USD --history_path ./history
 ```
 
 **Show help:**
