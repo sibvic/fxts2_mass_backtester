@@ -6,7 +6,7 @@
 #include "BacktestProject.h"
 #include "BacktestProjectSerializer.h"
 
-ConsoleBacktester::ConsoleBacktester(const std::string& pathToBacktester, const string& id) {
+ConsoleBacktester::ConsoleBacktester(const std::string& pathToBacktester, const std::string& id) {
     this->pathToBacktester = pathToBacktester;
     this->id = id;
 }
@@ -22,7 +22,7 @@ void ConsoleBacktester::run(const BacktestProject& project) {
     std::filesystem::create_directories(tempDir);
     
     // Create project file path in temp directory
-    std::filesystem::path projectPath = tempDir / "project" + id + ".bpj";
+    std::filesystem::path projectPath = tempDir / ("project" + id + ".bpj");
     
     try {
         BacktestProjectSerializer::serialize(project, projectPath.string());
@@ -30,8 +30,8 @@ void ConsoleBacktester::run(const BacktestProject& project) {
         std::cerr << "Error saving project: " << e.what() << std::endl;
     }
     
-    std::filesystem::path outputPath = tempDir / "backtest" + id + ".txt";
-    std::filesystem::path statsPath = tempDir / "stats" + id + ".txt";
+    std::filesystem::path outputPath = tempDir / ("backtest_" + id + ".txt");
+    std::filesystem::path statsPath = tempDir / ("stats" + id + ".txt");
     std::filesystem::path backtesterPath = std::filesystem::path(pathToBacktester) / "ConsoleBacktester.exe";
     
     std::string command = backtesterPath.string() + " " + projectPath.string() + " /o " + outputPath.string() + " /so " + statsPath.string();

@@ -2,11 +2,15 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <ctime>
+#include "BacktestProject.h"
+#include "ConsoleBacktester.h"
 
 struct AppConfig {
     std::string sourcesPath;
     std::string strategyId;
     std::string tradingSymbol;
+    std::string pathToBacktester;
     bool helpRequested = false;
 };
 
@@ -16,6 +20,7 @@ void printUsage(const char* programName) {
     std::cout << "  --sources_path PATH    Path to data sources" << std::endl;
     std::cout << "  --strategy_id ID       Strategy identifier" << std::endl;
     std::cout << "  --trading_symbol SYMBOL Trading symbol (e.g., EURUSD)" << std::endl;
+    std::cout << "  --path_to_backtester PATH Path to backtester" << std::endl;
     std::cout << "  --help                 Show this help message" << std::endl;
     std::cout << std::endl;
     std::cout << "Example:" << std::endl;
@@ -40,6 +45,9 @@ AppConfig parseArguments(int argc, char* argv[]) {
         }
         else if (arg == "--trading_symbol" && i + 1 < argc) {
             config.tradingSymbol = argv[++i];
+        }
+        else if (arg == "--path_to_backtester" && i + 1 < argc) {
+            config.pathToBacktester = argv[++i];
         }
         else {
             std::cerr << "Error: Unknown argument or missing value: " << arg << std::endl;
@@ -75,6 +83,7 @@ void printConfig(const AppConfig& config) {
     std::cout << "  Sources Path: " << config.sourcesPath << std::endl;
     std::cout << "  Strategy ID: " << config.strategyId << std::endl;
     std::cout << "  Trading Symbol: " << config.tradingSymbol << std::endl;
+    std::cout << "  Path to Backtester: " << config.pathToBacktester << std::endl;
     std::cout << std::endl;
 }
 
@@ -99,9 +108,19 @@ int main(int argc, char* argv[]) {
     // Display configuration
     printConfig(config);
     
-    std::cout << "Starting backtesting process..." << std::endl;
-    
-    
+    auto backtester = ConsoleBacktester(config.pathToBacktester, config.strategyId);
+    auto project = BacktestProject();
+    project.strategy = config.strategyId;
+    project.startTime = 946684800; // 1 January 2000, 00:00:00 UTC
+    project.endTime = static_cast<long long>(std::time(nullptr));
+    project.accountCurrency = "USD";
+    project.initialAmount = 50000.0;
+    project.defaultPeriod = "m1";
+    project.accountLotSize = 100000;
+    project.instruments.emplace_back(config.tradingSymbol, 0.02, 0.0001, 5, "EUR", "USD", 1, 100000, 1);
+    backtester.run(project);
+
+    std::cout << "Backtest completed" << std::endl;
     
     return 0;
 }

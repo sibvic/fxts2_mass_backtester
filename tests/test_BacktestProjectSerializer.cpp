@@ -32,16 +32,7 @@ protected:
         project.accountLotSize = 100000;
 
         // Add sample instrument
-        Instrument instrument;
-        instrument.name = "EURUSD";
-        instrument.mmr = 0.02;
-        instrument.pipSize = 0.0001;
-        instrument.precision = 5;
-        instrument.contractCurrency = "USD";
-        instrument.profitCurrency = "USD";
-        instrument.contractMultiplier = 1;
-        instrument.baseUnitSize = 100000;
-        instrument.instrumentType = 1;
+        Instrument instrument("EURUSD", 0.02, 0.0001, 5, "USD", "USD", 1, 100000, 1);
         project.instruments.push_back(instrument);
 
         // Add sample strategy parameters
@@ -205,16 +196,7 @@ TEST_F(BacktestProjectSerializerTest, SerializeMultipleInstruments) {
     BacktestProject project = createSampleProject();
     
     // Add second instrument
-    Instrument instrument2;
-    instrument2.name = "GBPUSD";
-    instrument2.mmr = 0.03;
-    instrument2.pipSize = 0.0001;
-    instrument2.precision = 5;
-    instrument2.contractCurrency = "USD";
-    instrument2.profitCurrency = "USD";
-    instrument2.contractMultiplier = 1;
-    instrument2.baseUnitSize = 100000;
-    instrument2.instrumentType = 1;
+    Instrument instrument2("GBPUSD", 0.03, 0.0001, 5, "USD", "USD", 1, 100000, 1);
     project.instruments.push_back(instrument2);
 
     std::string outputPath = testDir + "/multiple_instruments.xml";
@@ -277,16 +259,8 @@ TEST_F(BacktestProjectSerializerTest, SerializeNumericPrecision) {
     BacktestProject project = createSampleProject();
     project.initialAmount = 12345.6789;
     
-    Instrument instrument;
-    instrument.name = "TEST";
-    instrument.mmr = 0.123456789;
-    instrument.pipSize = 0.00001;
-    instrument.precision = 5;
-    instrument.contractCurrency = "USD";
-    instrument.profitCurrency = "USD";
-    instrument.contractMultiplier = 1;
-    instrument.baseUnitSize = 100000;
-    instrument.instrumentType = 1;
+    Instrument instrument("TEST", 0.123456789, 0.00001, 5, "USD", "USD", 1, 100000, 1);
+
     project.instruments.clear();
     project.instruments.push_back(instrument);
 

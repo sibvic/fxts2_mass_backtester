@@ -5,6 +5,17 @@
 
 class Instrument {
 public:
+    Instrument(const std::string& name, double mmr, double pipSize, int precision, const std::string& contractCurrency, const std::string& profitCurrency, int contractMultiplier, int baseUnitSize, int instrumentType) {
+        this->name = name;
+        this->mmr = mmr;
+        this->pipSize = pipSize;
+        this->precision = precision;
+        this->contractCurrency = contractCurrency;
+        this->profitCurrency = profitCurrency;
+        this->contractMultiplier = contractMultiplier;
+        this->baseUnitSize = baseUnitSize;
+        this->instrumentType = instrumentType;
+    }
     std::string name;
     double mmr;
     double pipSize;
