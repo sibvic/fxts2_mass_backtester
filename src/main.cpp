@@ -5,9 +5,11 @@
 #include <vector>
 #include <ctime>
 #include <iomanip>
+#include <filesystem>
 #include "BacktestProject.h"
 #include "ConsoleBacktester.h"
 #include "DatesIterator.h"
+#include "SymbolInfoParser.h"
 
 struct AppConfig {
     std::string sourcesPath;
@@ -137,15 +139,51 @@ int main(int argc, char* argv[]) {
     int totalWeeks = 0;
     int completedWeeks = 0;
     
+    // Load symbol information from config file
+    std::string symbolInfoPath = config.historyPath + "/" + config.tradingSymbol + "/info.json";
     
-
+    // Check if symbol info file exists
+    if (!std::filesystem::exists(symbolInfoPath)) {
+        std::cerr << "Warning: Symbol info file not found: " << symbolInfoPath << std::endl;
+        std::cerr << "Using default symbol configuration." << std::endl;
+        return 1;
+    }
+    SymbolInfo symbolInfo;
+    try {
+        symbolInfo = SymbolInfoParser::parse(symbolInfoPath);
+        std::cout << "Loaded symbol info from: " << symbolInfoPath << std::endl;
+        std::cout << "Symbol: " << symbolInfo.name << ", Provider: " << symbolInfo.provider << std::endl;
+        std::cout << "Contract Currency: " << symbolInfo.contractCurrency 
+                    << ", Profit Currency: " << symbolInfo.profitCurrency << std::endl;
+        std::cout << "Base Unit Size: " << symbolInfo.baseUnitSize 
+                    << ", MMR: " << symbolInfo.mmr 
+                    << ", Pip Size: " << symbolInfo.pipSize << std::endl;
+    } catch (const std::exception& e) {
+        std::cerr << "Warning: Failed to load symbol info from " << symbolInfoPath << ": " << e.what() << std::endl;
+        std::cerr << "Using default symbol configuration." << std::endl;
+        
+        return 1;
+    }
+    
     auto project = BacktestProject();
     project.strategy = config.strategyId;
     project.accountCurrency = "USD";
     project.initialAmount = 50000.0;
     project.defaultPeriod = "m1";
-    project.accountLotSize = 100000;
-    project.instruments.emplace_back(config.tradingSymbol, 0.02, 0.0001, 5, "EUR", "USD", 1, 100000, 1);
+    project.accountLotSize = static_cast<int>(symbolInfo.baseUnitSize);
+    
+    // Create instrument from symbol info
+    project.instruments.emplace_back(
+        symbolInfo.name,
+        symbolInfo.mmr,
+        symbolInfo.pipSize,
+        symbolInfo.precision,
+        symbolInfo.contractCurrency,
+        symbolInfo.profitCurrency,
+        symbolInfo.contractMultiplier,
+        symbolInfo.baseUnitSize,
+        symbolInfo.instrumentType
+    );
     
     // Loop through each week from start date to current week start
     std::tm currentDate = datesIterator.current();

@@ -1,0 +1,15 @@
+{
+    "Provider": "OANDA",
+    "ContractCurrency": "USD",
+    "ProfitCurrency": "USD",
+    "BaseUnitSize": 100000.0,
+    "ContractMultiplier": 1.0,
+    "InstrumentType": 1,
+    "MMR": 0.03,
+    "PipSize": 0.0001,
+    "Precision": 5,
+    "Name": "GBPUSD",
+    "MarginEnabled": true,
+    "WithoutHistory": false,
+    "EndOfHistoryReached": false
+}

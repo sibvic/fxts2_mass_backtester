@@ -66,16 +66,59 @@ The application requires three mandatory command-line parameters:
 - `--strategy_id ID` - Strategy identifier (e.g., MA_CROSS, RSI_STRATEGY)
 - `--trading_symbol SYMBOL` - Trading symbol (e.g., EURUSD, GBPUSD)
 
+### Symbol Information Configuration
+
+The application automatically loads symbol-specific configuration from JSON files located at:
+```
+{history_path}/{trading_symbol}/info.json
+```
+
+**Example symbol info file structure:**
+```json
+{
+    "Provider": "FXCM",
+    "ContractCurrency": "USD",
+    "ProfitCurrency": "USD",
+    "BaseUnitSize": 100000.0,
+    "ContractMultiplier": 1.0,
+    "InstrumentType": 1,
+    "MMR": 0.02,
+    "PipSize": 0.0001,
+    "Precision": 5,
+    "Name": "EURUSD",
+    "MarginEnabled": true,
+    "WithoutHistory": false,
+    "EndOfHistoryReached": false
+}
+```
+
+**Field Descriptions:**
+- `Provider`: Data provider name (e.g., "FXCM", "OANDA")
+- `ContractCurrency`: Contract currency (e.g., "USD", "EUR")
+- `ProfitCurrency`: Profit currency (e.g., "USD", "EUR")
+- `BaseUnitSize`: Base unit size for the instrument
+- `ContractMultiplier`: Contract multiplier
+- `InstrumentType`: Instrument type identifier
+- `MMR`: Margin requirement
+- `PipSize`: Size of one pip
+- `Precision`: Decimal precision for price display
+- `Name`: Symbol name
+- `MarginEnabled`: Whether margin trading is enabled
+- `WithoutHistory`: Whether historical data is missing
+- `EndOfHistoryReached`: Whether end of history has been reached
+
+If the symbol info file is not found or cannot be parsed, the application will use default values and display a warning message.
+
 ### Usage Examples
 
 **Windows:**
 ```batch
-build\bin\Release\FXTS2MassBacktester.exe --sources_path ./data --strategy_id MA_CROSS --trading_symbol EURUSD
+build\bin\Release\FXTS2MassBacktester.exe --sources_path ./data --strategy_id MA_CROSS --trading_symbol EURUSD --history_path ./history
 ```
 
 **Linux/macOS:**
 ```bash
-./FXTS2MassBacktester --sources_path ./data --strategy_id MA_CROSS --trading_symbol EURUSD
+./FXTS2MassBacktester --sources_path ./data --strategy_id MA_CROSS --trading_symbol EURUSD --history_path ./history
 ```
 
 **Show help:**
