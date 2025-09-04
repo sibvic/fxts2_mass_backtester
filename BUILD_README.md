@@ -6,7 +6,8 @@ This is a basic C++ console application for the FXTS2 Mass Backtester project.
 
 - **Windows**: Visual Studio 2019/2022 with C++ workload, or MinGW-w64
 - **Linux/macOS**: GCC or Clang compiler
-- **CMake**: Version 3.10 or higher (optional, for CMake builds)
+- **CMake**: Version 3.10 or higher
+- **Internet connection**: Required for downloading Google Test during build
 
 ## Building the Application
 
@@ -37,19 +38,49 @@ This is a basic C++ console application for the FXTS2 Mass Backtester project.
 ### Option 2: Using Makefile
 
 ```bash
+# Build main application
 make
+
+# Build and run tests (if Google Test is available)
+make test
+
+# Build tests only
+make test-build
+
+# Show help
+make help
+
+# Clean build artifacts
+make clean
+```
+
 ```
 
 ## Running the Application
 
-### Windows
+The application requires three mandatory command-line parameters:
+
+### Required Parameters
+
+- `--sources_path PATH` - Path to data sources directory
+- `--strategy_id ID` - Strategy identifier (e.g., MA_CROSS, RSI_STRATEGY)
+- `--trading_symbol SYMBOL` - Trading symbol (e.g., EURUSD, GBPUSD)
+
+### Usage Examples
+
+**Windows:**
 ```batch
-build\bin\Release\FXTS2MassBacktester.exe
+build\bin\Release\FXTS2MassBacktester.exe --sources_path ./data --strategy_id MA_CROSS --trading_symbol EURUSD
 ```
 
-### Linux/macOS
+**Linux/macOS:**
 ```bash
-./FXTS2MassBacktester
+./FXTS2MassBacktester --sources_path ./data --strategy_id MA_CROSS --trading_symbol EURUSD
+```
+
+**Show help:**
+```bash
+./FXTS2MassBacktester --help
 ```
 
 ## Project Structure
