@@ -1,8 +1,9 @@
 #include <string>
+#include <optional>
 
 class SymbolInfo {
 public:
-    std::string provider;
+    std::optional<std::string> provider;
     std::string contractCurrency;
     std::string profitCurrency;
     double baseUnitSize;

@@ -156,7 +156,13 @@ int main(int argc, char* argv[]) {
     try {
         symbolInfo = SymbolInfoParser::parse(symbolInfoPath);
         std::cout << "Loaded symbol info from: " << symbolInfoPath << std::endl;
-        std::cout << "Symbol: " << symbolInfo.name << ", Provider: " << symbolInfo.provider << std::endl;
+        std::cout << "Symbol: " << symbolInfo.name;
+        if (symbolInfo.provider.has_value()) {
+            std::cout << ", Provider: " << symbolInfo.provider.value();
+        } else {
+            std::cout << ", Provider: (not specified)";
+        }
+        std::cout << std::endl;
         std::cout << "Contract Currency: " << symbolInfo.contractCurrency 
                     << ", Profit Currency: " << symbolInfo.profitCurrency << std::endl;
         std::cout << "Base Unit Size: " << symbolInfo.baseUnitSize 

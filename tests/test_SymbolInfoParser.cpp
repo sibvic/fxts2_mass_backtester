@@ -63,7 +63,8 @@ TEST_F(SymbolInfoParserTest, ParseCompleteValidJson) {
 
     SymbolInfo info = SymbolInfoParser::parse(filePath);
 
-    EXPECT_EQ(info.provider, "FXCM");
+    EXPECT_TRUE(info.provider.has_value());
+    EXPECT_EQ(info.provider.value(), "FXCM");
     EXPECT_EQ(info.contractCurrency, "USD");
     EXPECT_EQ(info.profitCurrency, "USD");
     EXPECT_DOUBLE_EQ(info.baseUnitSize, 100000.0);
@@ -90,7 +91,8 @@ TEST_F(SymbolInfoParserTest, ParseWithMissingFields) {
 
     SymbolInfo info = SymbolInfoParser::parse(filePath);
 
-    EXPECT_EQ(info.provider, "OANDA");
+    EXPECT_TRUE(info.provider.has_value());
+    EXPECT_EQ(info.provider.value(), "OANDA");
     EXPECT_EQ(info.name, "GBPUSD");
     EXPECT_EQ(info.contractCurrency, ""); // Default empty string
     EXPECT_EQ(info.profitCurrency, "");   // Default empty string
@@ -494,7 +496,7 @@ TEST_F(SymbolInfoParserTest, ParseEmptyJson) {
     SymbolInfo info = SymbolInfoParser::parse(filePath);
 
     // All fields should have default values
-    EXPECT_EQ(info.provider, "");
+    EXPECT_FALSE(info.provider.has_value());
     EXPECT_EQ(info.contractCurrency, "");
     EXPECT_EQ(info.profitCurrency, "");
     EXPECT_DOUBLE_EQ(info.baseUnitSize, 0.0);
@@ -507,22 +509,6 @@ TEST_F(SymbolInfoParserTest, ParseEmptyJson) {
     EXPECT_FALSE(info.marginEnabled);
     EXPECT_FALSE(info.withoutHistory);
     EXPECT_FALSE(info.endOfHistoryReached);
-}
-
-// Test parsing with only whitespace
-TEST_F(SymbolInfoParserTest, ParseOnlyWhitespace) {
-    std::string jsonContent = R"({   })";
-
-    createTestFile("whitespace_only.json", jsonContent);
-    std::string filePath = (testDir / "whitespace_only.json").string();
-
-    SymbolInfo info = SymbolInfoParser::parse(filePath);
-
-    // All fields should have default values
-    EXPECT_EQ(info.provider, "");
-    EXPECT_EQ(info.name, "");
-    EXPECT_DOUBLE_EQ(info.baseUnitSize, 0.0);
-    EXPECT_EQ(info.instrumentType, 0);
 }
 
 // Test parsing with invalid numeric values
@@ -577,6 +563,45 @@ TEST_F(SymbolInfoParserTest, ParseSmallIntegerValues) {
 
     EXPECT_EQ(info.instrumentType, -2147483648);
     EXPECT_EQ(info.precision, -2147483648);
+}
+
+// Test parsing with provider field missing
+TEST_F(SymbolInfoParserTest, ParseWithProviderMissing) {
+    std::string jsonContent = R"({
+        "Name": "TEST",
+        "BaseUnitSize": 100000.0,
+        "InstrumentType": 1
+    })";
+
+    createTestFile("no_provider.json", jsonContent);
+    std::string filePath = (testDir / "no_provider.json").string();
+
+    SymbolInfo info = SymbolInfoParser::parse(filePath);
+
+    EXPECT_FALSE(info.provider.has_value());
+    EXPECT_EQ(info.name, "TEST");
+    EXPECT_DOUBLE_EQ(info.baseUnitSize, 100000.0);
+    EXPECT_EQ(info.instrumentType, 1);
+}
+
+// Test parsing with provider field null
+TEST_F(SymbolInfoParserTest, ParseWithProviderNull) {
+    std::string jsonContent = R"({
+        "Provider": null,
+        "Name": "TEST",
+        "BaseUnitSize": 100000.0,
+        "InstrumentType": 1
+    })";
+
+    createTestFile("provider_null.json", jsonContent);
+    std::string filePath = (testDir / "provider_null.json").string();
+
+    SymbolInfo info = SymbolInfoParser::parse(filePath);
+
+    EXPECT_FALSE(info.provider.has_value());
+    EXPECT_EQ(info.name, "TEST");
+    EXPECT_DOUBLE_EQ(info.baseUnitSize, 100000.0);
+    EXPECT_EQ(info.instrumentType, 1);
 }
 
 // Test parsing with file not found

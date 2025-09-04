@@ -71,10 +71,11 @@ The project uses **Google Test (gtest)** as the testing framework, which is auto
 - **ParseWithVerySmallNumbers**: Tests parsing with very small numbers
 - **ParseUnquotedBooleanValues**: Tests parsing unquoted boolean values
 - **ParseEmptyJson**: Tests parsing with empty JSON object
-- **ParseOnlyWhitespace**: Tests parsing with only whitespace
 - **ParseInvalidNumericValues**: Tests parsing with invalid numeric values
 - **ParseLargeIntegerValues**: Tests parsing with very large integers
 - **ParseSmallIntegerValues**: Tests parsing with very small integers
+- **ParseWithProviderMissing**: Tests parsing when provider field is missing
+- **ParseWithProviderNull**: Tests parsing when provider field is null
 - **ParseFileNotFound**: Tests error handling for missing files
 - **ParseInvalidJson**: Tests error handling for malformed JSON
 

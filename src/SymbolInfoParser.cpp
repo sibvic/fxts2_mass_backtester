@@ -14,7 +14,9 @@ SymbolInfo SymbolInfoParser::parse(const std::string& path) {
     SymbolInfo info;
     
     // Parse string fields with default empty strings
-    info.provider = j.value("Provider", "");
+    if (j.contains("Provider") && !j["Provider"].is_null()) {
+        info.provider = j.value("Provider", "");
+    }
     info.contractCurrency = j.value("ContractCurrency", "");
     info.profitCurrency = j.value("ProfitCurrency", "");
     info.name = j.value("Name", "");

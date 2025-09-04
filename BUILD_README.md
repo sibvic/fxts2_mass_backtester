@@ -97,7 +97,7 @@ The application automatically loads symbol-specific configuration from JSON file
 ```
 
 **Field Descriptions:**
-- `Provider`: Data provider name (e.g., "FXCM", "OANDA")
+- `Provider`: Data provider name (e.g., "FXCM", "OANDA") - **Optional field**
 - `ContractCurrency`: Contract currency (e.g., "USD", "EUR")
 - `ProfitCurrency`: Profit currency (e.g., "USD", "EUR")
 - `BaseUnitSize`: Base unit size for the instrument
@@ -112,6 +112,8 @@ The application automatically loads symbol-specific configuration from JSON file
 - `EndOfHistoryReached`: Whether end of history has been reached
 
 If the symbol info file is not found or cannot be parsed, the application will use default values and display a warning message.
+
+**Note:** The `Provider` field is optional. If not specified or set to `null`, the application will display "(not specified)" for the provider information.
 
 ### Usage Examples
 
