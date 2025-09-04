@@ -1,5 +1,6 @@
 #include <string>
 #include "BacktestProject.h"
+#include <optional>
 
 class ConsoleBacktester {
 private:
@@ -7,5 +8,5 @@ private:
     std::string id;
 public:
     ConsoleBacktester(const std::string& pathToBacktester, const std::string& id);
-    void run(const BacktestProject& project, const std::string& tradingHistoryPath);
+    void run(const BacktestProject& project, const std::optional<std::string>& tradingHistoryPath);
 };

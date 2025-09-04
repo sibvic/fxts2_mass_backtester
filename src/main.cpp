@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <optional>
 #include <map>
 #include <vector>
 #include <ctime>
@@ -13,6 +14,7 @@ struct AppConfig {
     std::string strategyId;
     std::string tradingSymbol;
     std::string pathToBacktester;
+    std::string historyPath;
     bool helpRequested = false;
 };
 
@@ -23,6 +25,7 @@ void printUsage(const char* programName) {
     std::cout << "  --strategy_id ID       Strategy identifier" << std::endl;
     std::cout << "  --trading_symbol SYMBOL Trading symbol (e.g., EURUSD)" << std::endl;
     std::cout << "  --path_to_backtester PATH Path to backtester" << std::endl;
+    std::cout << "  --history_path PATH    Path to history" << std::endl;
     std::cout << "  --help                 Show this help message" << std::endl;
     std::cout << std::endl;
     std::cout << "Example:" << std::endl;
@@ -50,6 +53,9 @@ AppConfig parseArguments(int argc, char* argv[]) {
         }
         else if (arg == "--path_to_backtester" && i + 1 < argc) {
             config.pathToBacktester = argv[++i];
+        }
+        else if (arg == "--history_path" && i + 1 < argc) {
+            config.historyPath = argv[++i];
         }
         else {
             std::cerr << "Error: Unknown argument or missing value: " << arg << std::endl;
@@ -86,6 +92,7 @@ void printConfig(const AppConfig& config) {
     std::cout << "  Strategy ID: " << config.strategyId << std::endl;
     std::cout << "  Trading Symbol: " << config.tradingSymbol << std::endl;
     std::cout << "  Path to Backtester: " << config.pathToBacktester << std::endl;
+    std::cout << "  Path to History: " << config.historyPath << std::endl;
     std::cout << std::endl;
 }
 
@@ -130,6 +137,8 @@ int main(int argc, char* argv[]) {
     int totalWeeks = 0;
     int completedWeeks = 0;
     
+    
+
     auto project = BacktestProject();
     project.strategy = config.strategyId;
     project.accountCurrency = "USD";
@@ -153,16 +162,17 @@ int main(int argc, char* argv[]) {
                   << ", End date: " << std::put_time(&nextDate, "%Y-%m-%d") << std::endl;
         
         // Create trading history path
-        auto tradingHistoryPath = "history/" + config.tradingSymbol + "/" + std::to_string(currentDate.tm_year + 1900) 
-            + "/" + std::to_string(week) + ".csv";
+        std::optional<std::string> tradingHistoryPath = 
+            config.historyPath.empty() ? std::optional<std::string>() : std::optional<std::string>(config.historyPath + "/" + config.tradingSymbol + "/" + std::to_string(currentDate.tm_year + 1900) 
+            + "-" + std::to_string(week) + ".csv");
         
-        std::cout << "Running backtest for week " << tradingHistoryPath << std::endl;
-        
+        std::cout << "Running backtest for week " << tradingHistoryPath.value_or("no trading history") << std::endl;
+
         try {
             backtester.run(project, tradingHistoryPath);
             completedWeeks++;
         } catch (const std::exception& e) {
-            std::cerr << "Error running backtest for week " << tradingHistoryPath 
+            std::cerr << "Error running backtest for week " << tradingHistoryPath.value_or("no trading history") 
                       << ": " << e.what() << std::endl;
         }
         

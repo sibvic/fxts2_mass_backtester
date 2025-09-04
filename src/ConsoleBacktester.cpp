@@ -11,7 +11,7 @@ ConsoleBacktester::ConsoleBacktester(const std::string& pathToBacktester, const 
     this->id = id;
 }
 
-void ConsoleBacktester::run(const BacktestProject& project, const std::string& tradingHistoryPath) {
+void ConsoleBacktester::run(const BacktestProject& project, const std::optional<std::string>& tradingHistoryPath) {
     if (pathToBacktester.empty()) {
         std::cerr << "Error: Path to backtester is not set" << std::endl;
         return;
@@ -35,7 +35,11 @@ void ConsoleBacktester::run(const BacktestProject& project, const std::string& t
     std::filesystem::path backtesterPath = std::filesystem::path(pathToBacktester) / "ConsoleBacktester.exe";
     
     std::string command = backtesterPath.string() + " " + projectPath.string() + " /o " + outputPath.string() 
-        + " /so " + statsPath.string() + " /trading_history " + tradingHistoryPath;
+        + " /so " + statsPath.string();
+    if (tradingHistoryPath.has_value())
+    {
+        command += " /trading_history " + tradingHistoryPath.value();
+    }
     std::system(command.c_str());
 
     // Delete temporary files
