@@ -1,11 +1,12 @@
 #include <string>
 #include <vector>
+#include <optional>
 
 #pragma once
 
 class Instrument {
 public:
-    Instrument(const std::string& name, double mmr, double pipSize, int precision, const std::string& contractCurrency, const std::string& profitCurrency, int contractMultiplier, int baseUnitSize, int instrumentType) {
+    Instrument(const std::string& name, double mmr, double pipSize, int precision, const std::string& contractCurrency, const std::string& profitCurrency, int contractMultiplier, int baseUnitSize, int instrumentType, const std::optional<std::string>& pricesFilePath) {
         this->name = name;
         this->mmr = mmr;
         this->pipSize = pipSize;
@@ -15,6 +16,7 @@ public:
         this->contractMultiplier = contractMultiplier;
         this->baseUnitSize = baseUnitSize;
         this->instrumentType = instrumentType;
+        this->pricesFilePath = pricesFilePath;
     }
     std::string name;
     double mmr;
@@ -25,6 +27,7 @@ public:
     int contractMultiplier;
     int baseUnitSize;
     int instrumentType;
+    std::optional<std::string> pricesFilePath;
 };
 
 class StrategyParameter{

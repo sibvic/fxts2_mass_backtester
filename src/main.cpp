@@ -101,11 +101,6 @@ void printConfig(const AppConfig& config) {
 
 int getWeekNumber(const std::tm& date) {
     std::tm firstJan = date;
-    firstJan.tm_mon = 0;
-    firstJan.tm_mday = 1;
-    firstJan.tm_hour = 0;
-    firstJan.tm_min = 0;
-    firstJan.tm_sec = 0;
     std::mktime(&firstJan);
     return firstJan.tm_yday / 7 + 1;
 }
@@ -192,7 +187,8 @@ int main(int argc, char* argv[]) {
         symbolInfo.profitCurrency,
         symbolInfo.contractMultiplier,
         symbolInfo.baseUnitSize,
-        symbolInfo.instrumentType
+        symbolInfo.instrumentType,
+        std::optional<std::string>()
     );
     
     // Loop through each week from start date to current week start
@@ -213,7 +209,8 @@ int main(int argc, char* argv[]) {
         std::optional<std::string> tradingHistoryPath = 
             config.historyPath.empty() ? std::optional<std::string>() : std::optional<std::string>(config.historyPath + "/" + escapedSymbol + "/" + std::to_string(currentDate.tm_year + 1900) 
             + "-" + std::to_string(week) + ".csv");
-        
+        project.instruments[0].pricesFilePath = tradingHistoryPath;
+            
         std::cout << "Running backtest for week " << tradingHistoryPath.value_or("no trading history") << std::endl;
 
         try {

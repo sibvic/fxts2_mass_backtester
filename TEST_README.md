@@ -34,6 +34,8 @@ The project uses **Google Test (gtest)** as the testing framework, which is auto
 - **SerializeMultipleStrategyParameters**: Tests serialization with multiple strategy parameters
 - **SerializeSpecialCharacters**: Tests handling of special characters in strings
 - **SerializeNumericPrecision**: Tests numeric precision in serialization
+- **SerializeWithPricesFilePath**: Tests serialization with optional pricesFilePath field
+- **SerializeWithoutPricesFilePath**: Tests serialization without optional pricesFilePath field
 
 #### 5. DatesIterator Tests
 - **ConstructorInitializesToCorrectDate**: Tests that constructor starts at January 1, 2000

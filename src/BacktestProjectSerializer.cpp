@@ -34,7 +34,11 @@ void BacktestProjectSerializer::serialize(const BacktestProject& project, const 
     file << " <account-lot-size value=\"" << project.accountLotSize << "\"/>\n";
     file << " <instruments>\n";
     for (const auto& instrument : project.instruments) {
-        file << " <instrument name=\"" << instrument.name << "\">\n";
+        file << " <instrument name=\"" << instrument.name << "\"";
+        if (instrument.pricesFilePath.has_value()) {
+            file << " filename=\"" << instrument.pricesFilePath.value() << "\"";
+        }
+        file << ">\n";
         file << " <mmr value=\"" << std::fixed << std::setprecision(2) << instrument.mmr << std::defaultfloat << "\"/>\n";
         file << " <pipSize value=\"" << instrument.pipSize << "\"/>\n";
         file << " <precision value=\"" << instrument.precision << "\"/>\n";

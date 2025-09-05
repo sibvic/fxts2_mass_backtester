@@ -32,7 +32,7 @@ protected:
         project.accountLotSize = 100000;
 
         // Add sample instrument
-        Instrument instrument("EURUSD", 0.02, 0.0001, 5, "USD", "USD", 1, 100000, 1);
+        Instrument instrument("EURUSD", 0.02, 0.0001, 5, "USD", "USD", 1, 100000, 1, std::optional<std::string>());
         project.instruments.push_back(instrument);
 
         // Add sample strategy parameters
@@ -196,7 +196,7 @@ TEST_F(BacktestProjectSerializerTest, SerializeMultipleInstruments) {
     BacktestProject project = createSampleProject();
     
     // Add second instrument
-    Instrument instrument2("GBPUSD", 0.03, 0.0001, 5, "USD", "USD", 1, 100000, 1);
+    Instrument instrument2("GBPUSD", 0.03, 0.0001, 5, "USD", "USD", 1, 100000, 1, std::optional<std::string>());
     project.instruments.push_back(instrument2);
 
     std::string outputPath = testDir + "/multiple_instruments.xml";
@@ -259,7 +259,7 @@ TEST_F(BacktestProjectSerializerTest, SerializeNumericPrecision) {
     BacktestProject project = createSampleProject();
     project.initialAmount = 12345.6789;
     
-    Instrument instrument("TEST", 0.123456789, 0.00001, 5, "USD", "USD", 1, 100000, 1);
+    Instrument instrument("TEST", 0.123456789, 0.00001, 5, "USD", "USD", 1, 100000, 1, std::optional<std::string>());
 
     project.instruments.clear();
     project.instruments.push_back(instrument);
@@ -273,4 +273,38 @@ TEST_F(BacktestProjectSerializerTest, SerializeNumericPrecision) {
     EXPECT_TRUE(content.find("<initial-amount value=\"12345.68\"/>") != std::string::npos); // Rounded to 2 decimals
     EXPECT_TRUE(content.find("<mmr value=\"0.12\"/>") != std::string::npos); // 2 decimal places
     EXPECT_TRUE(content.find("<pipSize value=\"1e-05\"/>") != std::string::npos); // Scientific notation
+}
+
+// Test optional pricesFilePath field
+TEST_F(BacktestProjectSerializerTest, SerializeWithPricesFilePath) {
+    BacktestProject project = createSampleProject();
+    
+    // Create instrument with pricesFilePath
+    Instrument instrument("EURUSD", 0.02, 0.0001, 5, "USD", "USD", 1, 100000, 1, "data/EURUSD_2024.csv");
+    project.instruments.clear();
+    project.instruments.push_back(instrument);
+
+    std::string outputPath = testDir + "/prices_file_path_test.xml";
+    BacktestProjectSerializer::serialize(project, outputPath);
+    std::string content = readFileContent(outputPath);
+
+    // Check that pricesFilePath is included when set
+    EXPECT_TRUE(content.find("filename=\"data/EURUSD_2024.csv\"") != std::string::npos);
+}
+
+// Test optional pricesFilePath field when not set
+TEST_F(BacktestProjectSerializerTest, SerializeWithoutPricesFilePath) {
+    BacktestProject project = createSampleProject();
+    
+    // Create instrument without pricesFilePath (using default constructor)
+    Instrument instrument("EURUSD", 0.02, 0.0001, 5, "USD", "USD", 1, 100000, 1, std::optional<std::string>());
+    project.instruments.clear();
+    project.instruments.push_back(instrument);
+
+    std::string outputPath = testDir + "/no_prices_file_path_test.xml";
+    BacktestProjectSerializer::serialize(project, outputPath);
+    std::string content = readFileContent(outputPath);
+
+    // Check that pricesFilePath is NOT included when not set
+    EXPECT_TRUE(content.find("filename=") == std::string::npos);
 }
