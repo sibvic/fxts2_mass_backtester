@@ -16,6 +16,7 @@ add_executable(${PROJECT_NAME}
     src/BacktestProjectSerializer.cpp
     src/ConsoleBacktester.cpp
     src/DatesIterator.cpp
+    src/RatesStorageProvider.cpp
     src/SymbolInfoParser.cpp
 )
 

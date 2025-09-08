@@ -11,6 +11,7 @@
 #include "ConsoleBacktester.h"
 #include "DatesIterator.h"
 #include "SymbolInfoParser.h"
+#include "RatesStorageProvider.h"
 
 struct AppConfig {
     std::string sourcesPath;
@@ -105,6 +106,27 @@ int getWeekNumber(const std::tm& date) {
     return firstJan.tm_yday / 7 + 1;
 }
 
+void printSymbolInfo(const SymbolInfo& symbolInfo) {
+    std::cout << "Loaded symbol info from: " << symbolInfo.name << std::endl;
+    std::cout << "Symbol: " << symbolInfo.name;
+    if (symbolInfo.provider.has_value()) {
+        std::cout << ", Provider: " << symbolInfo.provider.value();
+    } else {
+        std::cout << ", Provider: (not specified)";
+    }
+    std::cout << std::endl;
+    std::cout << "Contract Currency: " << symbolInfo.contractCurrency 
+                << ", Profit Currency: " << symbolInfo.profitCurrency << std::endl;
+    std::cout << "Base Unit Size: " << symbolInfo.baseUnitSize 
+                << ", MMR: " << symbolInfo.mmr 
+                << ", Pip Size: " << symbolInfo.pipSize << std::endl;
+    std::cout << "Precision: " << symbolInfo.precision << std::endl;
+    std::cout << "Margin Enabled: " << symbolInfo.marginEnabled << std::endl;
+    std::cout << "Without History: " << symbolInfo.withoutHistory << std::endl;
+    std::cout << "End of History Reached: " << symbolInfo.endOfHistoryReached << std::endl;
+    std::cout << std::endl;
+}
+
 int main(int argc, char* argv[]) {
     std::cout << "Welcome to FXTS2 Mass Backtester Console Application!" << std::endl;
     std::cout << "==================================================" << std::endl;
@@ -134,42 +156,16 @@ int main(int argc, char* argv[]) {
     DatesIterator datesIterator;
     int totalWeeks = 0;
     int completedWeeks = 0;
-    
-    // Load symbol information from config file
-    // Escape forward slashes in trading symbol for file paths
-    std::string escapedSymbol = config.tradingSymbol;
-    escapedSymbol.erase(std::remove(escapedSymbol.begin(), escapedSymbol.end(), '/'), escapedSymbol.end());
-    std::string symbolInfoPath = config.historyPath + "/" + escapedSymbol + "/info.json";
-    
-    // Check if symbol info file exists
-    if (!std::filesystem::exists(symbolInfoPath)) {
-        std::cerr << "Warning: Symbol info file not found: " << symbolInfoPath << std::endl;
+
+    RatesStorageProvider ratesStorageProvider(config.historyPath);
+    std::optional<SymbolInfo> symbolInfo = ratesStorageProvider.getSymbolInfo(config.tradingSymbol);
+    if (!symbolInfo.has_value()) {
+        std::cerr << "Warning: Symbol info not found: " << config.tradingSymbol << std::endl;
         std::cerr << "Using default symbol configuration." << std::endl;
         return 1;
     }
-    SymbolInfo symbolInfo;
-    try {
-        symbolInfo = SymbolInfoParser::parse(symbolInfoPath);
-        std::cout << "Loaded symbol info from: " << symbolInfoPath << std::endl;
-        std::cout << "Symbol: " << symbolInfo.name;
-        if (symbolInfo.provider.has_value()) {
-            std::cout << ", Provider: " << symbolInfo.provider.value();
-        } else {
-            std::cout << ", Provider: (not specified)";
-        }
-        std::cout << std::endl;
-        std::cout << "Contract Currency: " << symbolInfo.contractCurrency 
-                    << ", Profit Currency: " << symbolInfo.profitCurrency << std::endl;
-        std::cout << "Base Unit Size: " << symbolInfo.baseUnitSize 
-                    << ", MMR: " << symbolInfo.mmr 
-                    << ", Pip Size: " << symbolInfo.pipSize << std::endl;
-    } catch (const std::exception& e) {
-        std::cerr << "Warning: Failed to load symbol info from " << symbolInfoPath << ": " << e.what() << std::endl;
-        std::cerr << "Using default symbol configuration." << std::endl;
-        
-        return 1;
-    }
-    
+    printSymbolInfo(symbolInfo.value());
+
     auto project = BacktestProject();
     project.strategy = config.strategyId;
     project.accountCurrency = "USD";
@@ -179,15 +175,15 @@ int main(int argc, char* argv[]) {
     
     // Create instrument from symbol info
     project.instruments.emplace_back(
-        symbolInfo.name,
-        symbolInfo.mmr,
-        symbolInfo.pipSize,
-        symbolInfo.precision,
-        symbolInfo.contractCurrency,
-        symbolInfo.profitCurrency,
-        symbolInfo.contractMultiplier,
-        symbolInfo.baseUnitSize,
-        symbolInfo.instrumentType,
+        symbolInfo.value().name,
+        symbolInfo.value().mmr,
+        symbolInfo.value().pipSize,
+        symbolInfo.value().precision,
+        symbolInfo.value().contractCurrency,
+        symbolInfo.value().profitCurrency,
+        symbolInfo.value().contractMultiplier,
+        symbolInfo.value().baseUnitSize,
+        symbolInfo.value().instrumentType,
         std::optional<std::string>()
     );
     
@@ -197,8 +193,6 @@ int main(int argc, char* argv[]) {
     while (std::mktime(&nextDate) < now) {
         totalWeeks++;
         
-        int week = getWeekNumber(currentDate);
-        
         // Create project for this week
         project.startTime = std::mktime(&currentDate);
         project.endTime = std::mktime(&nextDate);
@@ -206,18 +200,16 @@ int main(int argc, char* argv[]) {
                   << ", End date: " << std::put_time(&nextDate, "%Y-%m-%d") << std::endl;
         
         // Create trading history path
-        std::optional<std::string> tradingHistoryPath = 
-            config.historyPath.empty() ? std::optional<std::string>() : std::optional<std::string>(config.historyPath + "/" + escapedSymbol + "/" + std::to_string(currentDate.tm_year + 1900) 
-            + "-" + std::to_string(week) + ".csv");
+        std::string tradingHistoryPath = ratesStorageProvider.prepareWeekData(config.tradingSymbol, currentDate);
         project.instruments[0].pricesFilePath = tradingHistoryPath;
             
-        std::cout << "Running backtest for week " << tradingHistoryPath.value_or("no trading history") << std::endl;
+        std::cout << "Running backtest for week " << tradingHistoryPath << std::endl;
 
         try {
-            backtester.run(project, tradingHistoryPath);
+            backtester.run(project);
             completedWeeks++;
         } catch (const std::exception& e) {
-            std::cerr << "Error running backtest for week " << tradingHistoryPath.value_or("no trading history") 
+            std::cerr << "Error running backtest for week " << tradingHistoryPath 
                       << ": " << e.what() << std::endl;
         }
         

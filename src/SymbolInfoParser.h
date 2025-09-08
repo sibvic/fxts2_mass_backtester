@@ -1,6 +1,8 @@
 #include <string>
 #include <optional>
 
+#pragma once
+
 class SymbolInfo {
 public:
     std::optional<std::string> provider;

@@ -11,7 +11,7 @@ ConsoleBacktester::ConsoleBacktester(const std::string& pathToBacktester, const 
     this->id = id;
 }
 
-void ConsoleBacktester::run(const BacktestProject& project, const std::optional<std::string>& tradingHistoryPath) {
+void ConsoleBacktester::run(const BacktestProject& project) {
     if (pathToBacktester.empty()) {
         std::cerr << "Error: Path to backtester is not set" << std::endl;
         return;
