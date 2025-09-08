@@ -33,14 +33,13 @@ std::optional<SymbolInfo> RatesStorageProvider::getSymbolInfo(const std::string&
 std::optional<std::string> RatesStorageProvider::prepareWeekData(const std::string& symbol, const std::tm& currentDate) {
     int week = getWeekNumber(currentDate);
     std::string escapedSymbol = escapeSymbol(symbol);
-    auto storagePath = historyPath + "/" + escapedSymbol + "/" + (std::to_string(currentDate.tm_year + 1900) + "-" 
-        + std::to_string(week) + ".csv");
+    std::string fileName = std::to_string(currentDate.tm_year + 1900) + "-" + std::to_string(week) + ".csv";
+    auto storagePath = historyPath + "/" + escapedSymbol + "/" + fileName;
     std::ifstream file(storagePath);
     if (!file.is_open()) {
         return std::nullopt;
     }
-    std::filesystem::path tempDir = std::filesystem::temp_directory_path() / "fxts2_backtester";
-    auto targetStoragePath = tempDir / (std::to_string(currentDate.tm_year + 1900) + "-" + std::to_string(week) + ".csv");
+    auto targetStoragePath = std::filesystem::temp_directory_path() / "fxts2_backtester" / fileName;
     std::ofstream targetFile(targetStoragePath);
     if (!targetFile.is_open()) {
         file.close();
