@@ -11,13 +11,13 @@ public:
     double high;
     double low;
     double close;
-    int volume;
 };
 
 class Data {
 public:
     BarData bid;
     BarData ask;
+    int volume;
     std::tm timestamp;
 };
 

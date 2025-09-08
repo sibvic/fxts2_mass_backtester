@@ -7,6 +7,5 @@ class Data;
 
 class IndicoreRatesSerializer {
 public:
-    static void addHeader(std::ofstream& file, const std::tm& from, const std::tm& to, bool hasVolume, double pipSize);
-    static void serialize(std::ofstream& file, const Data& data, bool hasVolume);
+    static void serialize(std::ofstream& file, const Data& data);
 };

@@ -16,8 +16,8 @@ std::optional<Data> StorageReader::readNext(std::ifstream& file) {
             tokens.push_back(token);
         }
         
-        // Expected format: time;open bid;high bid;low bid;close bid;open ask;high ask;low ask;close ask;volume bid;volume ask
-        if (tokens.size() != 11) {
+        // Expected format: time;open bid;high bid;low bid;close bid;open ask;high ask;low ask;close ask;volume
+        if (tokens.size() != 10) {
             return std::nullopt;
         }
         
@@ -62,12 +62,11 @@ std::optional<Data> StorageReader::readNext(std::ifstream& file) {
             data.bid.high = parseDecimal(tokens[2]);
             data.bid.low = parseDecimal(tokens[3]);
             data.bid.close = parseDecimal(tokens[4]);
-            data.bid.volume = parseInt(tokens[9]);
             data.ask.open = parseDecimal(tokens[5]);
             data.ask.high = parseDecimal(tokens[6]);
             data.ask.low = parseDecimal(tokens[7]);
             data.ask.close = parseDecimal(tokens[8]);
-            data.ask.volume = parseInt(tokens[10]);
+            data.volume = parseInt(tokens[9]);
             
             return data;
         } catch (const std::exception&) {

@@ -46,9 +46,10 @@ std::optional<std::string> RatesStorageProvider::prepareWeekData(const std::stri
         file.close();
         return std::nullopt;
     }
-    IndicoreRatesSerializer::addHeader(targetFile, currentDate, currentDate, true, 0.0001);
-    while (auto&& data = StorageReader::readNext(file)) {
-        IndicoreRatesSerializer::serialize(targetFile, data.value(), true);
+    auto data = StorageReader::readNext(file);
+    while (data.has_value()) {
+        IndicoreRatesSerializer::serialize(targetFile, data.value());
+        data = StorageReader::readNext(file);
     }
     targetFile.close();
     file.close();

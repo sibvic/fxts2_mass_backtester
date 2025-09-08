@@ -30,7 +30,7 @@ protected:
 
 TEST_F(StorageReaderTest, ReadValidData) {
     // Create test data with valid format
-    std::string testData = "29.04.2022 14:54:00;118,12;112,75;112,71;112,75;118,17;112,76;112,73;112,76;14;15";
+    std::string testData = "29.04.2022 14:54:00;118,12;112,75;112,71;112,75;118,17;112,76;112,73;112,76;14";
     createTestFile(testData);
 
     std::ifstream file(testFileName);
@@ -53,21 +53,21 @@ TEST_F(StorageReaderTest, ReadValidData) {
     EXPECT_DOUBLE_EQ(data.bid.high, 112.75);
     EXPECT_DOUBLE_EQ(data.bid.low, 112.71);
     EXPECT_DOUBLE_EQ(data.bid.close, 112.75);
-    EXPECT_EQ(data.bid.volume, 14);
-
     // Check ask data
     EXPECT_DOUBLE_EQ(data.ask.open, 118.17);
     EXPECT_DOUBLE_EQ(data.ask.high, 112.76);
     EXPECT_DOUBLE_EQ(data.ask.low, 112.73);
     EXPECT_DOUBLE_EQ(data.ask.close, 112.76);
-    EXPECT_EQ(data.ask.volume, 15);
+    
+    // Check volume
+    EXPECT_EQ(data.volume, 14);
 }
 
 TEST_F(StorageReaderTest, ReadMultipleLines) {
     // Create test data with multiple lines
     std::string testData = 
-        "29.04.2022 14:54:00;118,12;112,75;112,71;112,75;118,17;112,76;112,73;112,76;14;15\n"
-        "29.04.2022 15:00:00;119,50;113,25;113,20;113,25;119,55;113,30;113,25;113,30;20;25\n";
+        "29.04.2022 14:54:00;118,12;112,75;112,71;112,75;118,17;112,76;112,73;112,76;14\n"
+        "29.04.2022 15:00:00;119,50;113,25;113,20;113,25;119,55;113,30;113,25;113,30;20\n";
     createTestFile(testData);
 
     std::ifstream file(testFileName);
@@ -91,7 +91,7 @@ TEST_F(StorageReaderTest, ReadMultipleLines) {
 
 TEST_F(StorageReaderTest, HandleDotDecimalSeparator) {
     // Test with dot decimal separator
-    std::string testData = "29.04.2022 14:54:00;118.12;112.75;112.71;112.75;118.17;112.76;112.73;112.76;14;15";
+    std::string testData = "29.04.2022 14:54:00;118.12;112.75;112.71;112.75;118.17;112.76;112.73;112.76;14";
     createTestFile(testData);
 
     std::ifstream file(testFileName);
@@ -101,13 +101,12 @@ TEST_F(StorageReaderTest, HandleDotDecimalSeparator) {
 
     const Data& data = result.value();
     EXPECT_DOUBLE_EQ(data.bid.open, 118.12);
-    EXPECT_EQ(data.bid.volume, 14);
-    EXPECT_EQ(data.ask.volume, 15);
+    EXPECT_EQ(data.volume, 14);
 }
 
 TEST_F(StorageReaderTest, HandleCommaDecimalSeparator) {
     // Test with comma decimal separator
-    std::string testData = "29.04.2022 14:54:00;118,12;112,75;112,71;112,75;118,17;112,76;112,73;112,76;14;15";
+    std::string testData = "29.04.2022 14:54:00;118,12;112,75;112,71;112,75;118,17;112,76;112,73;112,76;14";
     createTestFile(testData);
 
     std::ifstream file(testFileName);
@@ -117,8 +116,7 @@ TEST_F(StorageReaderTest, HandleCommaDecimalSeparator) {
 
     const Data& data = result.value();
     EXPECT_DOUBLE_EQ(data.bid.open, 118.12);
-    EXPECT_EQ(data.bid.volume, 14);
-    EXPECT_EQ(data.ask.volume, 15);
+    EXPECT_EQ(data.volume, 14);
 }
 
 TEST_F(StorageReaderTest, HandleInvalidTokenCount) {
@@ -134,7 +132,7 @@ TEST_F(StorageReaderTest, HandleInvalidTokenCount) {
 
 TEST_F(StorageReaderTest, HandleTooManyTokens) {
     // Test with too many tokens
-    std::string testData = "29.04.2022 14:54:00;118,12;112,75;112,71;112,75;118,17;112,76;112,73;112,76;14;15;extra";
+    std::string testData = "29.04.2022 14:54:00;118,12;112,75;112,71;112,75;118,17;112,76;112,73;112,76;14;extra";
     createTestFile(testData);
 
     std::ifstream file(testFileName);
@@ -145,7 +143,7 @@ TEST_F(StorageReaderTest, HandleTooManyTokens) {
 
 TEST_F(StorageReaderTest, HandleInvalidDecimalFormat) {
     // Test with invalid decimal format
-    std::string testData = "29.04.2022 14:54:00;invalid;112,75;112,71;112,75;118,17;112,76;112,73;112,76;14;15";
+    std::string testData = "29.04.2022 14:54:00;invalid;112,75;112,71;112,75;118,17;112,76;112,73;112,76;14";
     createTestFile(testData);
 
     std::ifstream file(testFileName);
@@ -156,7 +154,7 @@ TEST_F(StorageReaderTest, HandleInvalidDecimalFormat) {
 
 TEST_F(StorageReaderTest, HandleInvalidTimestampFormat) {
     // Test with invalid timestamp format
-    std::string testData = "invalid-timestamp;118,12;112,75;112,71;112,75;118,17;112,76;112,73;112,76;14;15";
+    std::string testData = "invalid-timestamp;118,12;112,75;112,71;112,75;118,17;112,76;112,73;112,76;14";
     createTestFile(testData);
 
     std::ifstream file(testFileName);
@@ -167,7 +165,7 @@ TEST_F(StorageReaderTest, HandleInvalidTimestampFormat) {
 
 TEST_F(StorageReaderTest, HandleMalformedTimestamp) {
     // Test with malformed timestamp (wrong format)
-    std::string testData = "2022-04-29 14:54:00;118,12;112,75;112,71;112,75;118,17;112,76;112,73;112,76;14;15";
+    std::string testData = "2022-04-29 14:54:00;118,12;112,75;112,71;112,75;118,17;112,76;112,73;112,76;14";
     createTestFile(testData);
 
     std::ifstream file(testFileName);
@@ -178,7 +176,7 @@ TEST_F(StorageReaderTest, HandleMalformedTimestamp) {
 
 TEST_F(StorageReaderTest, HandleEmptyTimestamp) {
     // Test with empty timestamp
-    std::string testData = ";118,12;112,75;112,71;112,75;118,17;112,76;112,73;112,76;14;15";
+    std::string testData = ";118,12;112,75;112,71;112,75;118,17;112,76;112,73;112,76;14";
     createTestFile(testData);
 
     std::ifstream file(testFileName);
@@ -219,7 +217,7 @@ TEST_F(StorageReaderTest, HandleWhitespaceOnlyLine) {
 
 TEST_F(StorageReaderTest, HandleMixedDecimalSeparators) {
     // Test with mixed decimal separators
-    std::string testData = "29.04.2022 14:54:00;118,12;112.75;112,71;112.75;118,17;112.76;112,73;112.76;14;15";
+    std::string testData = "29.04.2022 14:54:00;118,12;112.75;112,71;112.75;118,17;112.76;112,73;112.76;14";
     createTestFile(testData);
 
     std::ifstream file(testFileName);
@@ -236,8 +234,7 @@ TEST_F(StorageReaderTest, HandleMixedDecimalSeparators) {
     EXPECT_DOUBLE_EQ(data.ask.high, 112.76);
     EXPECT_DOUBLE_EQ(data.ask.low, 112.73);
     EXPECT_DOUBLE_EQ(data.ask.close, 112.76);
-    EXPECT_EQ(data.bid.volume, 14);
-    EXPECT_EQ(data.ask.volume, 15);
+    EXPECT_EQ(data.volume, 14);
 }
 
 TEST_F(StorageReaderTest, HandleZeroValues) {
@@ -255,17 +252,16 @@ TEST_F(StorageReaderTest, HandleZeroValues) {
     EXPECT_DOUBLE_EQ(data.bid.high, 0.0);
     EXPECT_DOUBLE_EQ(data.bid.low, 0.0);
     EXPECT_DOUBLE_EQ(data.bid.close, 0.0);
-    EXPECT_EQ(data.bid.volume, 0);
     EXPECT_DOUBLE_EQ(data.ask.open, 0.0);
     EXPECT_DOUBLE_EQ(data.ask.high, 0.0);
     EXPECT_DOUBLE_EQ(data.ask.low, 0.0);
     EXPECT_DOUBLE_EQ(data.ask.close, 0.0);
-    EXPECT_EQ(data.ask.volume, 0);
+    EXPECT_EQ(data.volume, 0);
 }
 
 TEST_F(StorageReaderTest, HandleNegativeValues) {
     // Test with negative values (if supported by the format)
-    std::string testData = "29.04.2022 14:54:00;-118,12;-112,75;-112,71;-112,75;-118,17;-112,76;-112,73;-112,76;-14;-15";
+    std::string testData = "29.04.2022 14:54:00;-118,12;-112,75;-112,71;-112,75;-118,17;-112,76;-112,73;-112,76;-14";
     createTestFile(testData);
 
     std::ifstream file(testFileName);
@@ -278,10 +274,9 @@ TEST_F(StorageReaderTest, HandleNegativeValues) {
     EXPECT_DOUBLE_EQ(data.bid.high, -112.75);
     EXPECT_DOUBLE_EQ(data.bid.low, -112.71);
     EXPECT_DOUBLE_EQ(data.bid.close, -112.75);
-    EXPECT_EQ(data.bid.volume, -14);
     EXPECT_DOUBLE_EQ(data.ask.open, -118.17);
     EXPECT_DOUBLE_EQ(data.ask.high, -112.76);
     EXPECT_DOUBLE_EQ(data.ask.low, -112.73);
     EXPECT_DOUBLE_EQ(data.ask.close, -112.76);
-    EXPECT_EQ(data.ask.volume, -15);
+    EXPECT_EQ(data.volume, -14);
 }
