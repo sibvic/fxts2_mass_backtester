@@ -40,15 +40,13 @@ std::optional<std::string> RatesStorageProvider::prepareWeekData(const std::stri
         return std::nullopt;
     }
     std::filesystem::path tempDir = std::filesystem::temp_directory_path() / "fxts2_backtester";
-    auto targetStoragePath = tempDir / escapedSymbol / (std::to_string(currentDate.tm_year + 1900) + "-" 
-        + std::to_string(week) + ".csv");
+    auto targetStoragePath = tempDir / (std::to_string(currentDate.tm_year + 1900) + "-" + std::to_string(week) + ".csv");
     std::ofstream targetFile(targetStoragePath);
     if (!targetFile.is_open()) {
         file.close();
         return std::nullopt;
     }
     IndicoreRatesSerializer::addHeader(targetFile, currentDate, currentDate, true, 0.0001);
-
     while (auto&& data = StorageReader::readNext(file)) {
         IndicoreRatesSerializer::serialize(targetFile, data.value(), true);
     }
