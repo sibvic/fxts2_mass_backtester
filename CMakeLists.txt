@@ -17,6 +17,7 @@ add_executable(${PROJECT_NAME}
     src/ConsoleBacktester.cpp
     src/DatesIterator.cpp
     src/RatesStorageProvider.cpp
+    src/StorageReader.cpp
     src/SymbolInfoParser.cpp
 )
 
@@ -75,6 +76,12 @@ add_executable(
   src/SymbolInfoParser.cpp
 )
 
+add_executable(
+  StorageReaderTests
+  tests/test_StorageReader.cpp
+  src/StorageReader.cpp
+)
+
 # Link test executables with gtest
 target_link_libraries(
   BacktestProjectSerializerTests
@@ -92,10 +99,16 @@ target_link_libraries(
   nlohmann_json::nlohmann_json
 )
 
+target_link_libraries(
+  StorageReaderTests
+  gtest_main
+)
+
 # Include directories for tests
 target_include_directories(BacktestProjectSerializerTests PRIVATE src)
 target_include_directories(DatesIteratorTests PRIVATE src)
 target_include_directories(SymbolInfoParserTests PRIVATE src)
+target_include_directories(StorageReaderTests PRIVATE src)
 
 # Enable testing
 enable_testing()
@@ -104,6 +117,7 @@ enable_testing()
 add_test(NAME BacktestProjectSerializerTests COMMAND BacktestProjectSerializerTests)
 add_test(NAME DatesIteratorTests COMMAND DatesIteratorTests)
 add_test(NAME SymbolInfoParserTests COMMAND SymbolInfoParserTests)
+add_test(NAME StorageReaderTests COMMAND StorageReaderTests)
 
 # Print configuration info
 message(STATUS "Project: ${PROJECT_NAME}")
