@@ -1,6 +1,9 @@
 #include "RatesStorageProvider.h"
 #include <filesystem>
+#include "StorageReader.h"
+#include "IndicoreRatesSerializer.h"
 #include <algorithm>
+#include <fstream>
 
 RatesStorageProvider::RatesStorageProvider(const std::string& historyPath) {
     this->historyPath = historyPath;
@@ -27,8 +30,29 @@ std::optional<SymbolInfo> RatesStorageProvider::getSymbolInfo(const std::string&
     return SymbolInfoParser::parse(symbolInfoPath);
 }
 
-std::string RatesStorageProvider::prepareWeekData(const std::string& symbol, std::tm currentDate) {
+std::optional<std::string> RatesStorageProvider::prepareWeekData(const std::string& symbol, const std::tm& currentDate) {
     int week = getWeekNumber(currentDate);
     std::string escapedSymbol = escapeSymbol(symbol);
-    return historyPath + "/" + escapedSymbol + "/" + std::to_string(currentDate.tm_year + 1900) + "-" + std::to_string(week) + ".csv";
+    auto storagePath = historyPath + "/" + escapedSymbol + "/" + (std::to_string(currentDate.tm_year + 1900) + "-" 
+        + std::to_string(week) + ".csv");
+    std::ifstream file(storagePath);
+    if (!file.is_open()) {
+        return std::nullopt;
+    }
+    std::filesystem::path tempDir = std::filesystem::temp_directory_path() / "fxts2_backtester";
+    auto targetStoragePath = tempDir / escapedSymbol / (std::to_string(currentDate.tm_year + 1900) + "-" 
+        + std::to_string(week) + ".csv");
+    std::ofstream targetFile(targetStoragePath);
+    if (!targetFile.is_open()) {
+        file.close();
+        return std::nullopt;
+    }
+    IndicoreRatesSerializer::addHeader(targetFile, currentDate, currentDate, true, 0.0001);
+
+    while (auto&& data = StorageReader::readNext(file)) {
+        IndicoreRatesSerializer::serialize(targetFile, data.value(), true);
+    }
+    targetFile.close();
+    file.close();
+    return targetStoragePath.string();
 }

@@ -19,6 +19,7 @@ add_executable(${PROJECT_NAME}
     src/RatesStorageProvider.cpp
     src/StorageReader.cpp
     src/SymbolInfoParser.cpp
+    src/IndicoreRatesSerializer.cpp
 )
 
 # Set compiler flags
@@ -82,6 +83,12 @@ add_executable(
   src/StorageReader.cpp
 )
 
+add_executable(
+  IndicoreRatesSerializerTests
+  tests/test_IndicoreRatesSerializer.cpp
+  src/IndicoreRatesSerializer.cpp
+)
+
 # Link test executables with gtest
 target_link_libraries(
   BacktestProjectSerializerTests
@@ -104,11 +111,17 @@ target_link_libraries(
   gtest_main
 )
 
+target_link_libraries(
+  IndicoreRatesSerializerTests
+  gtest_main
+)
+
 # Include directories for tests
 target_include_directories(BacktestProjectSerializerTests PRIVATE src)
 target_include_directories(DatesIteratorTests PRIVATE src)
 target_include_directories(SymbolInfoParserTests PRIVATE src)
 target_include_directories(StorageReaderTests PRIVATE src)
+target_include_directories(IndicoreRatesSerializerTests PRIVATE src)
 
 # Enable testing
 enable_testing()
@@ -118,6 +131,7 @@ add_test(NAME BacktestProjectSerializerTests COMMAND BacktestProjectSerializerTe
 add_test(NAME DatesIteratorTests COMMAND DatesIteratorTests)
 add_test(NAME SymbolInfoParserTests COMMAND SymbolInfoParserTests)
 add_test(NAME StorageReaderTests COMMAND StorageReaderTests)
+add_test(NAME IndicoreRatesSerializerTests COMMAND IndicoreRatesSerializerTests)
 
 # Print configuration info
 message(STATUS "Project: ${PROJECT_NAME}")

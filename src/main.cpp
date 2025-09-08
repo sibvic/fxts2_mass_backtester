@@ -200,16 +200,23 @@ int main(int argc, char* argv[]) {
                   << ", End date: " << std::put_time(&nextDate, "%Y-%m-%d") << std::endl;
         
         // Create trading history path
-        std::string tradingHistoryPath = ratesStorageProvider.prepareWeekData(config.tradingSymbol, currentDate);
-        project.instruments[0].pricesFilePath = tradingHistoryPath;
+        std::optional<std::string> tradingHistoryPath = ratesStorageProvider.prepareWeekData(config.tradingSymbol, currentDate);
+        if (!tradingHistoryPath.has_value()) {
+            std::cout << "Skipping week for symbol " << config.tradingSymbol << std::endl;
+            // Move to next week
+            currentDate = nextDate;
+            nextDate = datesIterator.next();
+            continue;
+        }
+        project.instruments[0].pricesFilePath = tradingHistoryPath.value();
             
-        std::cout << "Running backtest for week " << tradingHistoryPath << std::endl;
+        std::cout << "Running backtest for week " << tradingHistoryPath.value() << std::endl;
 
         try {
             backtester.run(project);
             completedWeeks++;
         } catch (const std::exception& e) {
-            std::cerr << "Error running backtest for week " << tradingHistoryPath 
+            std::cerr << "Error running backtest for week " << tradingHistoryPath.value() 
                       << ": " << e.what() << std::endl;
         }
         

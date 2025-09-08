@@ -28,6 +28,13 @@ std::optional<Data> StorageReader::readNext(std::ifstream& file) {
             return std::stod(normalized);
         };
 
+        // Helper function to parse integer (for volume)
+        auto parseInt = [](const std::string& str) -> int {
+            std::string normalized = str;
+            std::replace(normalized.begin(), normalized.end(), ',', '.');
+            return static_cast<int>(std::stod(normalized));
+        };
+
         // Helper function to parse timestamp
         auto parseTimestamp = [](const std::string& str) -> std::optional<std::tm> {
             std::tm tm = {};
@@ -55,12 +62,12 @@ std::optional<Data> StorageReader::readNext(std::ifstream& file) {
             data.bid.high = parseDecimal(tokens[2]);
             data.bid.low = parseDecimal(tokens[3]);
             data.bid.close = parseDecimal(tokens[4]);
-            data.bid.volume = parseDecimal(tokens[9]);
+            data.bid.volume = parseInt(tokens[9]);
             data.ask.open = parseDecimal(tokens[5]);
             data.ask.high = parseDecimal(tokens[6]);
             data.ask.low = parseDecimal(tokens[7]);
             data.ask.close = parseDecimal(tokens[8]);
-            data.ask.volume = parseDecimal(tokens[10]);
+            data.ask.volume = parseInt(tokens[10]);
             
             return data;
         } catch (const std::exception&) {

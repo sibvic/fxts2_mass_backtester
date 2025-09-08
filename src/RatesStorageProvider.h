@@ -9,7 +9,7 @@ class RatesStorageProvider {
 public:
     RatesStorageProvider(const std::string& historyPath);
     std::optional<SymbolInfo> getSymbolInfo(const std::string& symbol);
-    std::string prepareWeekData(const std::string& symbol, std::tm currentDate);
+    std::optional<std::string> prepareWeekData(const std::string& symbol, const std::tm& currentDate);
 private:
     int getWeekNumber(const std::tm& date);
     std::string escapeSymbol(const std::string& symbol);

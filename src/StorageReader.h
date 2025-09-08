@@ -11,7 +11,7 @@ public:
     double high;
     double low;
     double close;
-    double volume;
+    int volume;
 };
 
 class Data {
